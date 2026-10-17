@@ -1,40 +1,83 @@
-// week5_task1_file_io.c
-// Name: ________  Surname: ________  Student ID: ________
-//
-// Task 1: Read and write data from text files
-// Week 5 – Files & Modular Programming
-// TODO: Fill in the missing parts marked below.
-//
-// Build: make lab5   Run: ./bin/week5_task1_file_io
+/*
+ * Name: Mehmet Burak
+ * Surname: Duman
+ * Student ID: 241ADB160
+ */
 
 #include <stdio.h>
-#include <stdlib.h>
 
-#define DEFAULT_FILENAME "data.txt"
-#define LINE_LEN 256
+int main(int argc, char* argv[]) {
+  /* argv[1], varsa kullanicinin verdigi dosya adidir.
+     Yoksa varsayilan data.txt kullanilir. */
+  const char* filename = "data.txt";
 
-int main(int argc, char *argv[]) {
-    FILE *fp = NULL;
-    const char *filename = DEFAULT_FILENAME;
-    char line[LINE_LEN];
-    int line_count = 0;
+  if (argc > 1) {
+    filename = argv[1];
+  }
 
-    // BONUS: if a file name was given on the command line (argc > 1), use argv[1] instead.
+  printf("Writing lines to %s...\n", filename);
 
-    // TODO: 1. Print "Writing lines to <filename>..." and open the file for writing (mode "w")
-    // TODO: 2. Check that fp is not NULL. If it is: perror(filename); return EXIT_FAILURE;
-    // TODO: 3. Write 2–3 lines of text to the file using fprintf()
-    // TODO: 4. Close the file with fclose()
+  /* "w": dosyayi olusturur, varsa eski icerigini siler. */
+  FILE* fp = fopen(filename, "w");
 
-    // TODO: 5. Open the file again for reading (mode "r") and check for NULL again
-    // TODO: 6. Print "Reading contents:" and use fgets() in a loop to print each line
-    //          (BONUS: count the lines in line_count)
-    // TODO: 7. Close the file
+  if (fp == NULL) {
+    perror("Cannot open file for writing");
+    return 1;
+  }
 
-    // BONUS: printf("Lines read: %d\n", line_count);
+  /* fprintf: printf gibi, fakat ekrana degil dosyaya yazar. */
+  int failed = 0;
 
-    // Remove this line once you use these variables:
-    (void)argc; (void)argv; (void)fp; (void)filename; (void)line; (void)line_count;
+  if (fprintf(fp, "Hello, file I/O in C!\n") < 0) {
+    failed = 1;
+  }
 
-    return EXIT_SUCCESS;
+  if (fprintf(fp, "This is another line.\n") < 0) {
+    failed = 1;
+  }
+
+  /* fclose, bekleyen verilerin yazilmasinda da hata verebilir. */
+  if (fclose(fp) != 0) {
+    failed = 1;
+  }
+
+  if (failed) {
+    fprintf(stderr, "File writing failed.\n");
+    return 1;
+  }
+
+  /* "r": mevcut dosyayi okumak icin acar. */
+  fp = fopen(filename, "r");
+
+  if (fp == NULL) {
+    perror("Cannot open file for reading");
+    return 1;
+  }
+
+  printf("Reading contents:\n");
+
+  char line[256];
+  int count = 0;
+
+  /* fgets satir okur; EOF veya hatada NULL dondurur.
+     Satirdaki newline korundugu icin ekstra newline eklemiyoruz. */
+  while (fgets(line, sizeof(line), fp) != NULL) {
+    printf("%s", line);
+    count++;
+  }
+
+  failed = ferror(fp);
+
+  if (fclose(fp) != 0) {
+    failed = 1;
+  }
+
+  if (failed) {
+    fprintf(stderr, "File reading failed.\n");
+    return 1;
+  }
+
+  printf("Lines read: %d\n", count);
+
+  return 0;
 }

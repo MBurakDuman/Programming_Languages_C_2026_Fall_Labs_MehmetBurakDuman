@@ -1,48 +1,66 @@
 /*
- * week4_1_dynamic_array.c
- * Author: [Your Name]
- * Student ID: [Your ID]
- * Description:
- *   Demonstrates creation and usage of a dynamic array using malloc.
- *   Allocate memory for n integers, read them from the user,
- *   print their sum and average, and then free the memory.
- *
- *   Output must match the format in the Week 4 instructions exactly
- *   (it is checked by the autograder).
+ * Name: Mehmet Burak Duman
+ * Student ID: 241ADB160
  */
 
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 int main(void) {
-    int n;
-    int *arr = NULL;
+  int n;
 
-    printf("Enter number of elements: ");
-    if (scanf("%d", &n) != 1 || n <= 0) {
-        printf("Invalid size.\n");
-        return 1;
+  printf("Enter number of elements: ");
+
+  /* scanf sonucu 1 degilse sayi okunamadi.
+     || = veya. Gecersiz giriste n kontrol edilmez. */
+  if (scanf("%d", &n) != 1 || n <= 0) {
+    printf("Invalid size.\n");
+    return 1;
+  }
+
+  /* Eleman sayisi * eleman boyutu tasmasini onle. */
+  if ((size_t)n > SIZE_MAX / sizeof(int)) {
+    printf("Memory allocation failed.\n");
+    return 1;
+  }
+
+  /* malloc byte cinsinden alan ayirir.
+     arr, ayrilan alanin adresini tutar. */
+  int* arr = malloc((size_t)n * sizeof(int));
+
+  if (arr == NULL) {
+    printf("Memory allocation failed.\n");
+    return 1;
+  }
+
+  /* Toplami donguden once sifirla.
+     long long, int'e gore daha buyuk toplam saklar. */
+  long long sum = 0;
+
+  printf("Enter %d integers: ", n);
+
+  /* Dizilerde ilk indeks 0, son indeks n - 1.
+     Bu nedenle i < n kullanilir. */
+  for (int i = 0; i < n; i++) {
+    if (scanf("%d", &arr[i]) != 1) {
+      free(arr);
+      printf("Invalid input.\n");
+      return 1;
     }
 
-    // TODO: Allocate memory for n integers using malloc
-    // Example: arr = malloc(n * sizeof(int));
+    sum = sum + arr[i];
+  }
 
-    // TODO: Check allocation success
-    // If arr is NULL: print "Memory allocation failed." and return 1
+  /* (double), bolmenin ondalikli yapilmasini saglar.
+     Aksi halde tam sayi bolmesi kesir kismini atar. */
+  double average = (double)sum / n;
 
-    // TODO: Print the prompt "Enter %d integers: " (with n), then read
-    //       n integers into the array.
-    //       If a value cannot be read: print "Invalid input.",
-    //       free the array and return 1
+  printf("Sum = %lld\n", sum);
+  printf("Average = %.2f\n", average);
 
-    // TODO: Compute the sum and the average (use floating point for the average)
+  /* Basarili malloc ile alinan bellegi geri ver. */
+  free(arr);
 
-    // TODO: Print the results exactly as:
-    //       Sum = <sum>
-    //       Average = <average with 2 decimals, %.2f>
-
-    // TODO: Free allocated memory
-    (void)arr;  // remove this line once you use arr
-
-    return 0;
+  return 0;
 }
